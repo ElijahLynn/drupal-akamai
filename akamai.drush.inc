@@ -6,42 +6,48 @@
 function akamai_drush_command() {
   $items = array();
 
-  $items['akamai-clear-url'] = array(
-    'description' => 'Akamai clear url.',
+  $items['akamai-purge-url'] = array(
+    'description' => 'Akamai purge URL.',
     'arguments' => array(
-      'path' => 'A path to clear. You can provide as many paths you like.',
+      'path' => 'A path to purge. You can provide as many paths you like. e.g. /node/1, /videos/earth',
     ),
     'options' => array(
-      'action' => 'Clearing action type.',
-      'domain' => 'The Akamai domain to use for cache clearing.',
+      'action' => 'Purge action. invalidate or remove',
+      'hostname' => 'Hostname. www.example.com',
+      'network' => 'The Akamai network to use for cache purging. staging or production',
     ),
-    'aliases' => array('akcu'),
-    'callback' => 'akamai_drush_clear_url',
+    'aliases' => array('ak-purge', 'akp'),
+    'callback' => 'drush_akamai_purge_url',
   );
 
   return $items;
 }
 
 /**
- * Callback function for ak-clear-url command.
+ * Callback function for akamai-purge-url command.
  *
- * Runs the akamai clear url command
+ * Runs akamai_purge_paths().
  */
-function akamai_drush_clear_url() {
+function drush_akamai_purge_url() {
   $paths = func_get_args();
   $overrides = array();
   if (drush_get_option('action')) {
-    $overrides['action'] = drush_get_optons('action');
+    $overrides['action'] = drush_get_option('action');
   }
-  if (drush_get_option('domain')) {
-    $overrides['domain'] = drush_get_optons('domain');
+  if (drush_get_option('hostname')) {
+    $overrides['hostname'] = drush_get_option('hostname');
   }
-  $did_clear = akamai_clear_url($paths, $overrides, NULL);
-  if ($did_clear) {
-    $message = t("Akamai Cache Request has been made successfully, please allow 10 minutes for changes to take effect.\n") . print_r($paths, TRUE);
+  if (drush_get_option('network')) {
+    $overrides['network'] = drush_get_option('network');
+  }
+  $result = akamai_purge_paths($paths);
+  if ($result) {
+    $message = t("Akamai cache purge request has been made successfully, please allow @estimated_seconds seconds for changes to take effect. The URLs purged were:\n", array('@estimated_seconds' => $result->estimatedSeconds)) . print_r($paths, TRUE);
+
     drush_print("$message\n");
   }
   else {
-    drush_set_error(t("There was a problem with your cache control request."));
+    // @todo Provide more detail about the problem.
+    drush_set_error(t("There was a problem with your cache purge request."));
   }
 }

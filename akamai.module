@@ -281,12 +281,12 @@ function akamai_purge_path($path, array $options = array()) {
 }
 
 /**
- * Purges a set of paths from Akamai's cache.
+ * Purges one or more paths from Akamai's cache.
  *
  * If purge request queuing is enabled, the path will be queued and submitted
  * to the CCU API when cron is run.
  *
- * If purge request queing is not enabled, the purge request will be made
+ * If purge request queuing is not enabled, the purge request will be made
  * immediately.
  *
  * @param array $paths
@@ -294,15 +294,15 @@ function akamai_purge_path($path, array $options = array()) {
  *   list of paths. These paths should already be properly formatted and include
  *   the base path (e.g. "/node/34", "/sitemap.xml").
  * @param string $hostname
- *   The hostname at which the paths to be purged exist. If omitted, the
- *   hostname will be obtained from the akamai_get_hostname() function.
+ *   (optional) The hostname at which the paths to be purged exist. If omitted,
+ *   the hostname will be obtained from the akamai_get_hostname() function.
  *
- * @return mixed
- *   A response object if the purge request was submitted sucessfully.
- *   FALSE if purge request submission or queing failed.
+ * @return object|false|true
+ *   A response object if the purge request was submitted successfully.
+ *   FALSE if purge request submission or queuing failed.
  *   TRUE if the request was queued.
  */
-function akamai_purge_paths(array $paths, $hostname = NULL) {
+function akamai_purge_paths(array $paths, $hostname = NULL, $overrides = NULL) {
   if (empty($hostname)) {
     $hostname = akamai_get_hostname();
   }
