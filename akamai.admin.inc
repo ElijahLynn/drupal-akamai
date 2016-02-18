@@ -216,7 +216,7 @@ function akamai_settings_form() {
 
   $form['akamai_network'] = array(
     '#type'          => 'radios',
-    '#title'         => t('Domain'),
+    '#title'         => t('Network'),
     '#default_value' => variable_get('akamai_network', CcuClientInterface::NETWORK_PRODUCTION),
     '#options'       => array(
       CcuClientInterface::NETWORK_STAGING    => t('Staging'),
@@ -327,7 +327,15 @@ function akamai_manual_purge_form() {
     '#description' => t('Enter one URL per line. Wildcards are not currently supported by v2 or v3 of the CCU REST API. URL entries should be relative to the basepath. (e.g. node/1, content/pretty-title, sites/default/files/some/image.png)'),
   );
 
-  $form['domain_override'] = array(
+  $form['akamai_hostname'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Hostname'),
+    '#default_value' => variable_get('akamai_hostname', ''),
+    '#description'   => t('The hostname that contains objects (paths) you want to purge, e.g. "www.example.com"'),
+    '#required'      => TRUE,
+  );
+
+  $form['network_override'] = array(
     '#type'          => 'select',
     '#title'         => t('Network'),
     '#default_value' => variable_get('akamai_network', CcuClientInterface::NETWORK_PRODUCTION),
